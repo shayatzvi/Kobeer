@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kosher Beer Finder</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Material Web -->
+<script type="module" src="https://unpkg.com/@material/web/all.js?module"></script>
+
+<style>
+:root {
+  --md-sys-color-primary: #1a73e8;
+  --md-sys-color-secondary: #fbbc04;
+  --md-sys-color-surface: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Google Sans', Arial, sans-serif;
+  background: #f8f9fa;
+  color: #202124;
+}
+
+header {
+  background: white;
+  padding: 16px 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12);
+  margin-bottom: 24px;
+}
+
+.beer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+  gap: 20px;
+}
+
+.hidden { display: none; }
+
+.admin-panel {
+  background: #eef3fd;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+md-filled-button {
+  margin-top: 12px;
+}
+
+.footer {
+  text-align:center;
+  padding: 30px;
+  color: #777;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h2>Kosher Beer Finder</h2>
+  <div>
+    <md-text-button onclick="showLogin()">Admin</md-text-button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Search -->
+  <div class="card">
+    <md-outlined-text-field id="searchInput" label="Search beers or breweries" style="width:100%"></md-outlined-text-field>
+  </div>
+
+  <!-- Beer List -->
+  <div id="beerList" class="beer-grid"></div>
+
+  <!-- Admin Login -->
+  <div id="loginModal" class="card hidden">
+    <h3>Admin Login</h3>
+    <md-outlined-text-field id="username" label="Username"></md-outlined-text-field><br><br>
+    <md-outlined-text-field id="password" type="password" label="Password"></md-outlined-text-field><br>
+    <md-filled-button onclick="login()">Login</md-filled-button>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="adminPanel" class="hidden">
+
+    <div class="admin-panel">
+      <h3>Add Beer</h3>
+      <md-outlined-text-field id="beerName" label="Beer Name"></md-outlined-text-field>
+      <md-outlined-text-field id="breweryName" label="Brewery"></md-outlined-text-field>
+      <md-outlined-text-field id="certifier" label="Kosher Certification"></md-outlined-text-field><br>
+      <md-filled-button onclick="addBeer()">Submit for Approval</md-filled-button>
+    </div>
+
+    <h3>Pending Approval</h3>
+    <div id="pendingList"></div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  Kosher Beer Finder © 2026
+</div>
+
+<script>
+let beers = JSON.parse(localStorage.getItem("beers")) || [
+  {id:1,name:"Heineken",brewery:"Heineken Brewery",certifier:"CRC",approved:true},
+  {id:2,name:"Blue Moon",brewery:"Molson Coors",certifier:"OU",approved:false}
+];
+
+function save() {
+  localStorage.setItem("beers", JSON.stringify(beers));
+}
+
+function render() {
+  const list = document.getElementById("beerList");
+  list.innerHTML = "";
+
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  beers.filter(b=>b.approved).filter(b =>
+    b.name.toLowerCase().includes(search) ||
+    b.brewery.toLowerCase().includes(search)
+  ).forEach(beer=>{
+    list.innerHTML += `
+      <div class="card">
+        <h3>${beer.name}</h3>
+        <p><strong>Brewery:</strong> ${beer.brewery}</p>
+        <p><strong>Certification:</strong> ${beer.certifier}</p>
+      </div>
+    `;
+  });
+
+  renderPending();
+}
+
+function renderPending() {
+  const pending = document.getElementById("pendingList");
+  pending.innerHTML = "";
+  beers.filter(b=>!b.approved).forEach(beer=>{
+    pending.innerHTML += `
+      <div class="card">
+        <h4>${beer.name}</h4>
+        <p>${beer.brewery} – ${beer.certifier}</p>
+        <md-filled-button onclick="approve(${beer.id})">Approve</md-filled-button>
+        <md-text-button onclick="deleteBeer(${beer.id})">Delete</md-text-button>
+        <md-text-button onclick="editBeer(${beer.id})">Edit</md-text-button>
+      </div>
+    `;
+  });
+}
+
+function addBeer() {
+  const name = document.getElementById("beerName").value;
+  const brewery = document.getElementById("breweryName").value;
+  const certifier = document.getElementById("certifier").value;
+
+  beers.push({
+    id: Date.now(),
+    name,
+    brewery,
+    certifier,
+    approved:false
+  });
+
+  save();
+  render();
+  alert("Beer submitted for approval");
+}
+
+function approve(id){
+  beers.find(b=>b.id===id).approved = true;
+  save();
+  render();
+}
+
+function deleteBeer(id){
+  beers = beers.filter(b=>b.id!==id);
+  save();
+  render();
+}
+
+function editBeer(id){
+  const beer = beers.find(b=>b.id===id);
+  const newName = prompt("Edit name", beer.name);
+  if(newName){
+    beer.name = newName;
+    save();
+    render();
+  }
+}
+
+function showLogin(){
+  document.getElementById("loginModal").classList.remove("hidden");
+}
+
+function login(){
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+
+  if(user==="admin" && pass==="kosher123"){
+    document.getElementById("adminPanel").classList.remove("hidden");
+    document.getElementById("loginModal").classList.add("hidden");
+  } else {
+    alert("Invalid login");
+  }
+}
+
+document.getElementById("searchInput").addEventListener("input", render);
+
+render();
+</script>
+
+</body>
+</html>
