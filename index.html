@@ -1,302 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kobeer - Kosher Beer Finder</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexGuard | Court Management System</title>
+    <!-- Google Fonts & Bootstrap -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-dark: #1a1c23;
+            --accent-color: #4f46e5;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; overflow-x: hidden; }
 
-<style>
-:root {
-    --google-blue: #1a73e8;
-    --surface: #ffffff;
-    --background: #f8f9fa;
-    --text-primary: #202124;
-    --text-secondary: #5f6368;
-    --border: #dadce0;
-    --shadow-1: 0 1px 3px rgba(0,0,0,0.1);
-}
+        /* --- LOGIN PAGE --- */
+        #login-page {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            color: white;
+        }
 
-* { box-sizing: border-box; }
+        /* --- DASHBOARD LAYOUT --- */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            background: var(--primary-dark);
+            color: #94a3b8;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .nav-link {
+            color: #94a3b8;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 0.2rem 1rem;
+        }
+        .nav-link.active, .nav-link:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        main {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+        }
 
-body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background: var(--background);
-    color: var(--text-primary);
-}
-
-/* ---------------- LOGIN PAGE ---------------- */
-
-#loginPage {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.login-card {
-    background: white;
-    width: 380px;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-1);
-}
-
-.login-card h2 {
-    font-family: 'Google Sans';
-    margin-bottom: 24px;
-    font-weight: 500;
-}
-
-.field {
-    position: relative;
-    margin-bottom: 24px;
-}
-
-.field input {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 15px;
-    outline: none;
-    transition: 0.2s;
-}
-
-.field input:focus {
-    border: 2px solid var(--google-blue);
-    box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
-}
-
-.btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background: var(--google-blue);
-    color: white;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 12px;
-}
-
-.btn-outline {
-    background: white;
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-}
-
-/* ---------------- APP LAYOUT ---------------- */
-
-#app {
-    display: none;
-    height: 100vh;
-}
-
-nav {
-    width: 240px;
-    background: white;
-    border-right: 1px solid var(--border);
-    padding: 20px;
-}
-
-main {
-    flex-grow: 1;
-    padding: 32px;
-}
-
-.layout {
-    display: flex;
-    height: 100%;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid var(--border);
-}
-
-.google-fab {
-    position: fixed;
-    bottom: 32px;
-    right: 32px;
-    background: white;
-    padding: 16px 20px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-1);
-    cursor: pointer;
-}
-</style>
+        /* --- STYLING ELEMENTS --- */
+        .card { border: none; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .stat-card { border-left: 5px solid var(--accent-color); }
+        .badge-status { font-size: 0.75rem; padding: 0.5em 1em; border-radius: 20px; }
+    </style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage">
-    <div class="login-card">
-        <h2>Login to Kobeer</h2>
-
-        <div class="field">
-            <input type="email" id="email" placeholder="Email">
+    <!-- AUTH SECTION -->
+    <section id="login-page">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <i class="bi bi-shield-lock-fill display-4 text-primary"></i>
+                <h2 class="mt-3 fw-bold">LexGuard</h2>
+                <p class="text-muted">Justice Management Portal</p>
+            </div>
+            <form id="login-form">
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="login-email" class="form-control bg-transparent text-white border-secondary" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-control bg-transparent text-white border-secondary" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Sign In</button>
+            </form>
         </div>
+    </section>
 
-        <div class="field">
-            <input type="password" id="password" placeholder="Password">
-        </div>
-
-        <button class="btn" id="loginEmail">Login</button>
-        <button class="btn btn-outline" id="registerEmail">Register</button>
-        <button class="btn btn-outline" id="googleLogin">Sign in with Google</button>
-    </div>
-</div>
-
-<!-- MAIN APP -->
-<div id="app">
-    <div class="layout">
-        <nav>
-            <h3>Kobeer</h3>
-            <button class="btn btn-outline" id="logoutBtn">Logout</button>
+    <!-- DASHBOARD SECTION (HIDDEN BY DEFAULT) -->
+    <section id="dashboard-page" style="display: none;">
+        <nav id="sidebar">
+            <div class="p-4 mb-4">
+                <h4 class="text-white fw-bold"><i class="bi bi-gavel me-2"></i>LexGuard</h4>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a href="#" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-folder2-open me-2"></i> Case Registry</a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Hearing Schedule</a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-people me-2"></i> Client Directory</a></li>
+                <li class="nav-item mt-5"><a href="#" id="logout-btn" class="nav-link text-danger"><i class="bi bi-box-arrow-left me-2"></i> Logout</a></li>
+            </ul>
         </nav>
 
         <main>
-            <h2>Live Beer Database</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Brewery</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody id="beerTableBody"></tbody>
-            </table>
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="fw-bold">Case Overview</h2>
+                    <p class="text-muted">Welcome back, Counselor.</p>
+                </div>
+                <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addCaseModal">
+                    <i class="bi bi-plus-lg me-2"></i> New Case Entry
+                </button>
+            </header>
+
+            <!-- Stats Row -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card stat-card p-3">
+                        <small class="text-muted text-uppercase fw-bold">Active Cases</small>
+                        <h2 id="active-count" class="fw-bold mt-2">0</h2>
+                    </div>
+                </div>
+                <!-- More stats can go here -->
+            </div>
+
+            <!-- Case Table -->
+            <div class="card">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Case ID</th>
+                                <th>Parties</th>
+                                <th>Category</th>
+                                <th>Judge</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="case-table-body">
+                            <!-- Data loaded from Firestore -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </main>
+    </section>
+
+    <!-- ADD CASE MODAL -->
+    <div class="modal fade" id="addCaseModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Log New Legal Matter</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="case-form">
+                        <div class="mb-3">
+                            <label class="form-label">Case Number</label>
+                            <input type="text" id="caseNo" class="form-control" placeholder="CN-2024-001" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Parties (Plaintiff vs Defendant)</label>
+                            <input type="text" id="parties" class="form-control" placeholder="John Doe vs. Acme Corp" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <select id="category" class="form-select">
+                                    <option>Civil</option>
+                                    <option>Criminal</option>
+                                    <option>Family</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select id="status" class="form-select">
+                                    <option value="Active">Active</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Register Case</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="google-fab" id="addBeerBtn">
-        + Add Beer
-    </div>
-</div>
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-    getAuth,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider,
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        const firebaseConfig = {
+        apiKey: "AIzaSyAQ6srV8znv9VPXSJadwndd1r-borokbV0",
+  authDomain: "lexguard-4e97d.firebaseapp.com",
+  projectId: "lexguard-4e97d",
+  storageBucket: "lexguard-4e97d.firebasestorage.app",
+  messagingSenderId: "579400873495",
+  appId: "1:579400873495:web:56f48cb7c6bd5d37bc8e52"
+        };
 
-import { 
-    getFirestore,
-    collection,
-    addDoc,
-    onSnapshot,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-const firebaseConfig = {
-    apiKey: "AIzaSyD1DrfRo933Hlsp_D6Ux2nigtcs2UouQbE",
-    authDomain: "kobeer-dcead.firebaseapp.com",
-    projectId: "kobeer-dcead",
-    storageBucket: "kobeer-dcead.firebasestorage.app",
-    messagingSenderId: "238456060030",
-    appId: "1:238456060030:web:7b94ef9094f16d17ab002f"
-};
+        // --- AUTH LOGIC ---
+        const loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            signInWithEmailAndPassword(auth, email, pass)
+                .catch(err => alert(err.message));
+        });
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('dashboard-page').style.display = 'block';
+                loadCases();
+            } else {
+                document.getElementById('login-page').style.display = 'flex';
+                document.getElementById('dashboard-page').style.display = 'none';
+            }
+        });
 
-const loginPage = document.getElementById("loginPage");
-const appPage = document.getElementById("app");
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-onAuthStateChanged(auth, user => {
-    if (user) {
-        loginPage.style.display = "none";
-        appPage.style.display = "block";
-    } else {
-        loginPage.style.display = "flex";
-        appPage.style.display = "none";
-    }
-});
+        // --- FIRESTORE LOGIC ---
+        const caseForm = document.getElementById('case-form');
+        caseForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, "cases"), {
+                    caseNo: document.getElementById('caseNo').value,
+                    parties: document.getElementById('parties').value,
+                    category: document.getElementById('category').value,
+                    status: document.getElementById('status').value,
+                    createdAt: new Date()
+                });
+                caseForm.reset();
+                bootstrap.Modal.getInstance(document.getElementById('addCaseModal')).hide();
+            } catch (e) { console.error("Error adding document: ", e); }
+        });
 
-/* -------- Email Login -------- */
-
-loginEmail.onclick = async () => {
-    try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-    } catch (e) {
-        alert(e.message);
-    }
-};
-
-registerEmail.onclick = async () => {
-    try {
-        await createUserWithEmailAndPassword(auth, email.value, password.value);
-    } catch (e) {
-        alert(e.message);
-    }
-};
-
-/* -------- Google Login -------- */
-
-googleLogin.onclick = async () => {
-    try {
-        await signInWithPopup(auth, provider);
-    } catch (e) {
-        alert(e.message);
-    }
-};
-
-logoutBtn.onclick = () => signOut(auth);
-
-/* -------- Firestore -------- */
-
-const beersCol = collection(db, "beers");
-
-onSnapshot(beersCol, snapshot => {
-    beerTableBody.innerHTML = "";
-    snapshot.forEach(doc => {
-        const beer = doc.data();
-        beerTableBody.innerHTML += `
-            <tr>
-                <td>${beer.name}</td>
-                <td>${beer.brewery}</td>
-                <td>${beer.type}</td>
-            </tr>
-        `;
-    });
-});
-
-addBeerBtn.onclick = async () => {
-    if (!auth.currentUser) return alert("Login required");
-
-    const name = prompt("Beer name:");
-    const brewery = prompt("Brewery:");
-    const type = prompt("Type:");
-
-    if (!name || !brewery || !type) return;
-
-    await addDoc(beersCol, {
-        name,
-        brewery,
-        type,
-        createdAt: serverTimestamp(),
-        userId: auth.currentUser.uid
-    });
-};
-</script>
-
+        function loadCases() {
+            const q = query(collection(db, "cases"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById('case-table-body');
+                let activeCount = 0;
+                tbody.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if(data.status === 'Active') activeCount++;
+                    
+                    const badgeClass = data.status === 'Active' ? 'bg-success' : (data.status === 'Pending' ? 'bg-warning text-dark' : 'bg-secondary');
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="ps-4 fw-semibold">${data.caseNo}</td>
+                            <td>${data.parties}</td>
+                            <td>${data.category}</td>
+                            <td>Hon. Justice Doe</td>
+                            <td><span class="badge badge-status ${badgeClass}">${data.status}</span></td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-light border"><i class="bi bi-eye"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('active-count').innerText = activeCount;
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
